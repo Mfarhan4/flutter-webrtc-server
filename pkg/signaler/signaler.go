@@ -26,6 +26,7 @@ type TurnCredentials struct {
 	Username string   `json:"username"`
 	Password string   `json:"password"`
 	TTL      int      `json:"ttl"`
+	Ac       string   `json:"ac"`
 	Uris     []string `json:"uris"`
 }
 
@@ -55,12 +56,14 @@ const (
 )
 
 type Request struct {
-	Type Method      `json:"type"`
-	Data interface{} `json:"data"`
+	Type   Method      `json:"type"`
+	Data   interface{} `json:"data"`
+	callId string      `json:"call_type"`
 }
 
 type PeerInfo struct {
 	ID        string `json:"id"`
+	VideoId   int    `json:"video_id"`
 	Name      string `json:"name"`
 	UserAgent string `json:"user_agent"`
 }
@@ -113,6 +116,7 @@ func (s *Signaler) NotifyPeersUpdate(conn *websocket.WebSocketConn, peers map[st
 	infos := []PeerInfo{}
 	for _, peer := range peers {
 		infos = append(infos, peer.info)
+
 	}
 
 	request := Request{
@@ -140,6 +144,7 @@ func (s *Signaler) HandleTurnServerCredentials(writer http.ResponseWriter, reque
 		return
 	}
 	username := params["username"][0]
+
 	timestamp := time.Now().Unix()
 	turnUsername := fmt.Sprintf("%d:%s", timestamp, username)
 	hmac := hmac.New(sha1.New, []byte(sharedKey))
@@ -171,6 +176,7 @@ func (s *Signaler) HandleTurnServerCredentials(writer http.ResponseWriter, reque
 	credential := TurnCredentials{
 		Username: turnUsername,
 		Password: turnPassword,
+		Ac:       "ac is here",
 		TTL:      ttl,
 		Uris: []string{
 			"turn:" + host + "?transport=udp",

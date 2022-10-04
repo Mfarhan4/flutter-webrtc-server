@@ -51,6 +51,5 @@ func main() {
 	config.CertFile = sslCert
 	config.KeyFile = sslKey
 	config.HTMLRoot = htmlRoot
-
 	wsServer.Bind(config)
 }
